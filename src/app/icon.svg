@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+  <defs>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#4F46E5" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#4F46E5" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  
+  <rect width="120" height="120" fill="url(#glow)"/>
+  
+  <g transform="translate(0, 0)">
+    <!-- Outer ring arcs -->
+    <circle cx="60" cy="60" r="52" fill="none" stroke="#312E81" stroke-width="2"/>
+    <circle cx="60" cy="60" r="52" fill="none" stroke="#6366F1" stroke-width="2" stroke-dasharray="82 246" stroke-dashoffset="0"/>
+    <circle cx="60" cy="60" r="52" fill="none" stroke="#A5B4FC" stroke-width="2" stroke-dasharray="30 246" stroke-dashoffset="-120"/>
+    
+    <!-- Middle ring -->
+    <circle cx="60" cy="60" r="35" fill="none" stroke="#4338CA" stroke-width="1.5" stroke-dasharray="55 165" stroke-dashoffset="-30"/>
+
+    <!-- Center hexagon mark -->
+    <polygon points="60,36 78,47 78,69 60,80 42,69 42,47" fill="#6366F1"/>
+    <polygon points="60,44 73,51 73,67 60,74 47,67 47,51" fill="#4338CA"/>
+
+    <!-- S letter in hex -->
+    <text x="60" y="67" font-family="system-ui, -apple-system, sans-serif" font-size="24" font-weight="800" fill="#E0E7FF" text-anchor="middle">S</text>
+
+    <!-- Orbit dots -->
+    <circle cx="112" cy="60" r="5" fill="#6366F1"/>
+    <circle cx="8" cy="60" r="4" fill="#4338CA"/>
+    <circle cx="60" cy="8" r="3.5" fill="#A5B4FC"/>
+    <circle cx="60" cy="112" r="3" fill="#312E81"/>
+    <circle cx="94" cy="19" r="2.5" fill="#818CF8"/>
+    <circle cx="26" cy="101" r="2" fill="#4338CA"/>
+  </g>
+</svg>

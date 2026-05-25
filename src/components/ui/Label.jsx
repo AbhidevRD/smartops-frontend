@@ -1,13 +1,10 @@
-import { cn } from '@/lib/utils';
+import React from 'react';
 
-export function Label({ className, children, ...props }) {
+export function Label({ children, htmlFor, className = '' }) {
   return (
     <label
-      className={cn(
-        'block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5',
-        className
-      )}
-      {...props}
+      htmlFor={htmlFor}
+      className={`block text-xs font-semibold text-brand-yellow/80 uppercase tracking-wider mb-1.5 ${className}`}
     >
       {children}
     </label>

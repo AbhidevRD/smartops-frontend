@@ -3,115 +3,132 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useAuthStore } from '@/store/authStore';
-import { Button } from '@/components/ui';
-import { Input } from '@/components/ui';
-import { Label } from '@/components/ui';
-import { Card, CardBody, CardHeader } from '@/components/ui';
+import { Mail, ArrowLeft, Loader2, Zap } from 'lucide-react';
+import { Logo } from '@/components/logo';
 
 export default function ForgotPasswordPage() {
-  const router = useRouter();
-  const { forgotPassword, isLoading, error } = useAuthStore();
   const [email, setEmail] = useState('');
-  const [submitted, setSubmitted] = useState(false);
-  const [localError, setLocalError] = useState('');
+  const [status, setStatus] = useState({ type: '', message: '' });
+  const [isLoading, setIsLoading] = useState(false);
+  const [focused, setFocused] = useState('');
+  const router = useRouter();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLocalError('');
+    setIsLoading(true);
+    setStatus({ type: '', message: '' });
 
-    if (!email) {
-      setLocalError('Please enter your email');
-      return;
-    }
-
-    const result = await forgotPassword(email);
-    if (result.success) {
-      setSubmitted(true);
-    } else {
-      setLocalError(result.error);
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/forgot-password`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to send OTP');
+      
+      router.push(`/verify-otp?email=${encodeURIComponent(email)}&type=reset`);
+    } catch (err) {
+      setStatus({ type: 'error', message: err.message });
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  if (submitted) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4">
-        <Card className="w-full max-w-md">
-          <CardHeader>
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 bg-gray-900 dark:bg-white rounded-lg flex items-center justify-center">
-                <span className="text-white dark:text-gray-900 font-bold">S</span>
-              </div>
-              <span className="text-lg font-semibold">SmartOps AI</span>
-            </div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Check your email</h2>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              We've sent a password reset link to <strong>{email}</strong>
-            </p>
-          </CardHeader>
-          <CardBody>
-            <div className="space-y-4">
-              <p className="text-sm text-gray-700 dark:text-gray-300">
-                Click the link in the email to reset your password. The link expires in 24 hours.
-              </p>
-              <Link href="/login">
-                <Button variant="secondary" className="w-full">
-                  Back to login
-                </Button>
-              </Link>
-            </div>
-          </CardBody>
-        </Card>
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <div className="flex items-center gap-2 mb-4">
-            <div className="w-8 h-8 bg-gray-900 dark:bg-white rounded-lg flex items-center justify-center">
-              <span className="text-white dark:text-gray-900 font-bold">S</span>
-            </div>
-            <span className="text-lg font-semibold">SmartOps AI</span>
+    <div className="min-h-screen flex items-center justify-center relative overflow-hidden"
+      style={{ background: 'linear-gradient(135deg, #001222 0%, #001829 50%, #00223a 100%)' }}>
+      
+      {/* Ambient glows */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-1/4 right-1/4 w-96 h-96 rounded-full opacity-[0.05]"
+          style={{ background: 'radial-gradient(circle, #FCBF49, transparent)', filter: 'blur(80px)' }} />
+        <div className="absolute bottom-1/4 left-1/4 w-80 h-80 rounded-full opacity-[0.05]"
+          style={{ background: 'radial-gradient(circle, #F77F00, transparent)', filter: 'blur(80px)' }} />
+      </div>
+
+      {/* Grid overlay */}
+      <div className="absolute inset-0 opacity-[0.015]"
+        style={{
+          backgroundImage: 'linear-gradient(rgba(247,127,0,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(247,127,0,0.5) 1px, transparent 1px)',
+          backgroundSize: '60px 60px',
+        }} />
+
+      <div className="w-full max-w-md px-6 py-8 animate-fade-in-up relative z-10">
+        <Link href="/login" className="inline-flex items-center gap-2 text-sm font-medium mb-6 transition-colors" style={{ color: '#94a3b8' }}>
+          <ArrowLeft size={16} /> Back to login
+        </Link>
+        
+        {/* Logo */}
+        <div className="flex flex-col mb-8">
+          <div className="mb-4 inline-block">
+            <Logo size="md" variant="iconOnly" animate={true} />
           </div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Forgot password?</h2>
-          <p className="text-sm text-gray-600 dark:text-gray-400">
-            Enter your email to receive a password reset link
+          <h1 className="text-2xl font-bold text-theme-text mt-2">Reset password</h1>
+          <p className="text-sm mt-1" style={{ color: 'rgba(252,191,73,0.6)' }}>
+            Enter your email to receive a secure OTP code.
           </p>
-        </CardHeader>
-        <CardBody>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {(error || localError) && (
-              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 px-4 py-3 rounded-lg text-sm">
-                {error || localError}
-              </div>
-            )}
+        </div>
 
+        {/* Card */}
+        <div className="rounded-2xl p-8"
+          style={{
+            background: 'rgba(0,48,73,0.4)',
+            backdropFilter: 'blur(24px)',
+            WebkitBackdropFilter: 'blur(24px)',
+            border: '1px solid rgba(247,127,0,0.18)',
+            boxShadow: '0 24px 80px rgba(0,0,0,0.5), 0 0 40px rgba(247,127,0,0.05)',
+          }}>
+
+          {status.message && (
+            <div className="mb-5 p-3.5 rounded-xl text-sm font-medium animate-fade-in"
+              style={status.type === 'error' 
+                ? { background: 'rgba(214,40,40,0.12)', border: '1px solid rgba(214,40,40,0.3)', color: '#fca5a5' }
+                : { background: 'rgba(34,197,94,0.12)', border: '1px solid rgba(34,197,94,0.3)', color: '#86efac' }
+              }>
+              {status.message}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="priya@smartops.ai"
-              />
+              <label className="block text-xs font-semibold uppercase tracking-wider mb-1.5"
+                style={{ color: 'rgba(252,191,73,0.7)' }}>Email Address</label>
+              <div className="relative">
+                <Mail size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 transition-colors"
+                  style={{ color: focused === 'email' ? '#F77F00' : 'var(--so-text-secondary)' }} />
+                <input
+                  type="email"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  onFocus={() => setFocused('email')}
+                  onBlur={() => setFocused('')}
+                  placeholder="name@company.com"
+                  required
+                  className="w-full pl-10 pr-4 py-3 text-sm rounded-xl text-theme-text placeholder-brand-muted outline-none transition-all"
+                  style={{
+                    background: 'rgba(0,32,48,0.7)',
+                    border: focused === 'email' ? '1px solid rgba(247,127,0,0.6)' : '1px solid rgba(247,127,0,0.15)',
+                    boxShadow: focused === 'email' ? '0 0 0 3px rgba(247,127,0,0.1), 0 0 12px rgba(247,127,0,0.1)' : 'none',
+                  }}
+                />
+              </div>
             </div>
 
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? 'Sending...' : 'Send reset link'}
-            </Button>
-
-            <div className="text-center">
-              <Link href="/login" className="text-sm text-gray-900 dark:text-white hover:underline">
-                Back to login
-              </Link>
-            </div>
+            <button
+              type="submit"
+              disabled={isLoading || !email}
+              className="w-full py-3 rounded-xl font-bold text-sm text-theme-text transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              style={{ background: 'linear-gradient(135deg, #F77F00, #D62828)', boxShadow: '0 4px 20px rgba(247,127,0,0.3)' }}
+              onMouseEnter={e => !isLoading && email && (e.currentTarget.style.boxShadow = '0 6px 30px rgba(247,127,0,0.5), 0 0 20px rgba(247,127,0,0.2)')}
+              onMouseLeave={e => (e.currentTarget.style.boxShadow = '0 4px 20px rgba(247,127,0,0.3)')}
+            >
+              {isLoading ? <Loader2 size={18} className="animate-spin" /> : <Zap size={16} />}
+              {isLoading ? 'Sending...' : 'Send OTP Code'}
+            </button>
           </form>
-        </CardBody>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }

@@ -1,12 +1,10 @@
-import { cn } from '@/lib/utils';
+import React from 'react';
 
-export function Card({ className, children, ...props }) {
+export function Card({ children, className = '', onClick, ...props }) {
   return (
     <div
-      className={cn(
-        'bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow dark:bg-gray-900 dark:border-gray-700',
-        className
-      )}
+      className={`so-card ${className}`}
+      onClick={onClick}
       {...props}
     >
       {children}
@@ -14,25 +12,17 @@ export function Card({ className, children, ...props }) {
   );
 }
 
-export function CardHeader({ className, children, ...props }) {
+export function CardHeader({ children, className = '' }) {
   return (
-    <div className={cn('px-6 py-4 border-b border-gray-200 dark:border-gray-700', className)} {...props}>
+    <div className={`px-5 pt-5 pb-3 ${className}`}>
       {children}
     </div>
   );
 }
 
-export function CardBody({ className, children, ...props }) {
+export function CardBody({ children, className = '' }) {
   return (
-    <div className={cn('px-6 py-4', className)} {...props}>
-      {children}
-    </div>
-  );
-}
-
-export function CardFooter({ className, children, ...props }) {
-  return (
-    <div className={cn('px-6 py-4 border-t border-gray-200 dark:border-gray-700', className)} {...props}>
+    <div className={`px-5 pb-5 ${className}`}>
       {children}
     </div>
   );
